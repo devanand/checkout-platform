@@ -1,0 +1,5 @@
+rootProject.name = "checkout-platform"
+
+include("checkout")
+include("pricing")
+include("offer")
