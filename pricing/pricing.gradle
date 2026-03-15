@@ -12,7 +12,6 @@ dependencies {
     annotationProcessor libs.lombok
 
     testImplementation libs.junit.jupiter
-    testRuntimeOnly libs.junit.platform.launcher
     testImplementation libs.mockito.core
     testImplementation libs.assertj.core
 }
