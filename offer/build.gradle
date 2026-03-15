@@ -12,16 +12,16 @@ java {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-context:7.0.0-M5'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:4.1.0-M1'
+    implementation libs.spring.context
+    implementation libs.spring.boot.starter.data.jpa
 
-    compileOnly 'org.projectlombok:lombok:1.18.42'
-    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
-    testImplementation 'org.mockito:mockito-core:5.18.0'
-    testImplementation 'org.assertj:assertj-core:3.27.7'
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.mockito.core
+    testImplementation libs.assertj.core
 }
 
 tasks.named('test') {

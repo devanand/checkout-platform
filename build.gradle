@@ -3,3 +3,11 @@ allprojects {
         mavenCentral()
     }
 }
+
+tasks.register("run") {
+    dependsOn(":checkout:bootRun")
+}
+
+tasks.register("test") {
+    dependsOn(":offer:test", ":pricing:test", ":checkout:test")
+}
