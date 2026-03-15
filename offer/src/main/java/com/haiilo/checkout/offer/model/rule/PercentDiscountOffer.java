@@ -5,6 +5,7 @@ import com.haiilo.checkout.offer.model.contract.OfferResult;
 import com.haiilo.checkout.offer.model.ValidityPeriod;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
@@ -49,7 +50,7 @@ public final class PercentDiscountOffer extends AbstractOffer {
                 BigDecimal.valueOf(100 - percentage)
                         .divide(BigDecimal.valueOf(100));
 
-        BigDecimal discountedTotal = regularTotal.multiply(discountMultiplier);
+        BigDecimal discountedTotal = regularTotal.multiply(discountMultiplier).setScale(2, RoundingMode.HALF_UP);
         AppliedOfferSummary summary = toAppliedOfferSummary();
         return new OfferResult(
                 discountedTotal,

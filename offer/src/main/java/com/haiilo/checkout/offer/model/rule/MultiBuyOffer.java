@@ -6,6 +6,7 @@ import com.haiilo.checkout.offer.model.contract.OfferResult;
 import com.haiilo.checkout.offer.model.ValidityPeriod;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
@@ -58,7 +59,7 @@ public final class MultiBuyOffer extends AbstractOffer {
 
         BigDecimal bundledTotal = bundlePrice.multiply(BigDecimal.valueOf(bundleCount));
         BigDecimal remainderTotal = unitPrice.multiply(BigDecimal.valueOf(remainder));
-        BigDecimal total = bundledTotal.add(remainderTotal);
+        BigDecimal total = bundledTotal.add(remainderTotal).setScale(2, RoundingMode.HALF_UP);
 
         AppliedOfferSummary summary = toAppliedOfferSummary();
 
