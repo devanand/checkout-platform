@@ -1,6 +1,7 @@
 package com.haiilo.checkout.offer.model.rule;
 
-import com.haiilo.checkout.offer.model.pricing.PricingResult;
+import com.haiilo.checkout.offer.model.AppliedOfferSummary;
+import com.haiilo.checkout.offer.model.contract.OfferResult;
 import com.haiilo.checkout.offer.model.ValidityPeriod;
 
 import java.math.BigDecimal;
@@ -29,7 +30,12 @@ public final class PercentDiscountOffer extends AbstractOffer {
     }
 
     @Override
-    public PricingResult apply(int quantity, BigDecimal unitPrice, String currency) {
+    public boolean appliesTo(int quantity) {
+        return quantity > 0;
+    }
+
+    @Override
+    public OfferResult apply(int quantity, BigDecimal unitPrice, String currency) {
         Objects.requireNonNull(unitPrice, "unitPrice must not be null");
         Objects.requireNonNull(currency, "currency must not be null");
 
@@ -44,7 +50,13 @@ public final class PercentDiscountOffer extends AbstractOffer {
                         .divide(BigDecimal.valueOf(100));
 
         BigDecimal discountedTotal = regularTotal.multiply(discountMultiplier);
-
-        return new PricingResult(discountedTotal, currency, toAppliedOfferSummary());
+        AppliedOfferSummary summary = toAppliedOfferSummary();
+        return new OfferResult(
+                discountedTotal,
+                currency,
+                summary.type(),
+                summary.description(),
+                false
+        );
     }
 }

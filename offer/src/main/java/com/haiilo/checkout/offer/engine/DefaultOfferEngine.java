@@ -1,8 +1,9 @@
 package com.haiilo.checkout.offer.engine;
 
 import com.haiilo.checkout.offer.catalog.OfferCatalog;
-import com.haiilo.checkout.offer.model.pricing.PricingContext;
-import com.haiilo.checkout.offer.model.pricing.PricingResult;
+import com.haiilo.checkout.offer.model.AppliedOfferSummary;
+import com.haiilo.checkout.offer.model.contract.OfferRequest;
+import com.haiilo.checkout.offer.model.contract.OfferResult;
 import com.haiilo.checkout.offer.model.rule.Offer;
 import org.springframework.stereotype.Service;
 
@@ -20,29 +21,45 @@ public class DefaultOfferEngine implements OfferEngine {
     }
 
     @Override
-    public List<PricingResult> applyOffers(List<PricingContext> contexts) {
-        List<PricingResult> results = new ArrayList<>();
+    public List<OfferResult> applyOffers(List<OfferRequest> requests) {
+        List<OfferResult> results = new ArrayList<>();
 
-        for (PricingContext context : contexts) {
-            Offer offer = offerCatalog.findFirstApplicable(context.productId());
+        for (OfferRequest request : requests) {
+            Offer offer = offerCatalog.findFirstApplicable(request.productId());
+
+            BigDecimal regularTotal = request.unitPrice().multiply(BigDecimal.valueOf(request.quantity()));
 
             if (offer == null) {
-                results.add(
-                        PricingResult.noOffer(
-                                context.unitPrice().multiply(BigDecimal.valueOf(context.quantity())),
-                                context.currency()
-                        )
-                );
+                results.add(OfferResult.noOffer(regularTotal, request.currency()));
                 continue;
             }
 
-            results.add(
-                    offer.apply(
-                            context.quantity(),
-                            context.unitPrice(),
-                            context.currency()
-                    )
+            AppliedOfferSummary summary = offer.toAppliedOfferSummary();
+
+            if (!offer.appliesTo(request.quantity())) {
+                results.add(new OfferResult(
+                        regularTotal,
+                        request.currency(),
+                        summary.type(),
+                        summary.description(),
+                        false
+                ));
+                continue;
+            }
+
+            OfferResult appliedResult = offer.apply(
+                    request.quantity(),
+                    request.unitPrice(),
+                    request.currency()
             );
+
+            results.add(new OfferResult(
+                    appliedResult.adjustedTotal(),
+                    appliedResult.currency(),
+                    summary.type(),
+                    summary.description(),
+                    true
+            ));
         }
 
         return results;

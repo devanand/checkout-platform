@@ -1,7 +1,7 @@
 package com.haiilo.checkout.offer.model.rule;
 
 import com.haiilo.checkout.offer.model.AppliedOfferSummary;
-import com.haiilo.checkout.offer.model.pricing.PricingResult;
+import com.haiilo.checkout.offer.model.contract.OfferResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,10 +12,8 @@ import java.time.LocalDate;
 public interface Offer {
 
     OfferType type();
-
     boolean isActive(LocalDate date);
-
+    boolean appliesTo(int quantity);
     AppliedOfferSummary toAppliedOfferSummary();
-
-    PricingResult apply(int quantity, BigDecimal unitPrice, String currency);
+    OfferResult apply(int quantity, BigDecimal unitPrice, String currency);
 }

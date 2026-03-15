@@ -1,7 +1,8 @@
 package com.haiilo.checkout.offer.model.rule;
 
 
-import com.haiilo.checkout.offer.model.pricing.PricingResult;
+import com.haiilo.checkout.offer.model.AppliedOfferSummary;
+import com.haiilo.checkout.offer.model.contract.OfferResult;
 import com.haiilo.checkout.offer.model.ValidityPeriod;
 
 import java.math.BigDecimal;
@@ -39,7 +40,12 @@ public final class MultiBuyOffer extends AbstractOffer {
     }
 
     @Override
-    public PricingResult apply(int quantity, BigDecimal unitPrice, String currency) {
+    public boolean appliesTo(int quantity) {
+        return quantity >= requiredQuantity;
+    }
+
+    @Override
+    public OfferResult apply(int quantity, BigDecimal unitPrice, String currency) {
         Objects.requireNonNull(unitPrice, "unitPrice must not be null");
         Objects.requireNonNull(currency, "currency must not be null");
 
@@ -54,6 +60,14 @@ public final class MultiBuyOffer extends AbstractOffer {
         BigDecimal remainderTotal = unitPrice.multiply(BigDecimal.valueOf(remainder));
         BigDecimal total = bundledTotal.add(remainderTotal);
 
-        return new PricingResult(total, currency, toAppliedOfferSummary());
+        AppliedOfferSummary summary = toAppliedOfferSummary();
+
+        return new OfferResult(
+                total,
+                currency,
+                summary.type(),
+                summary.description(),
+                false
+        );
     }
 }
