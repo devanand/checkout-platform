@@ -1,13 +1,28 @@
 allprojects {
+    group = 'com.haiilo'
+    version = '0.0.1-SNAPSHOT'
+
     repositories {
         mavenCentral()
     }
 }
 
-tasks.register("run") {
-    dependsOn(":checkout:bootRun")
+subprojects {
+    plugins.withType(JavaPlugin).configureEach {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
+        }
+
+        tasks.withType(Test).configureEach {
+            useJUnitPlatform()
+        }
+    }
 }
 
-tasks.register("test") {
-    dependsOn(":offer:test", ":pricing:test", ":checkout:test")
+tasks.register("run") {
+    group = "application"
+    description = "Run the checkout service"
+    dependsOn(":checkout:bootRun")
 }
