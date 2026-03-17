@@ -1,7 +1,6 @@
 package com.haiilo.checkout.application;
 
 import com.haiilo.checkout.domain.Cart;
-import com.haiilo.checkout.domain.CartItem;
 import com.haiilo.checkout.pricing.PricingService;
 import com.haiilo.checkout.pricing.model.PricingRequest;
 import com.haiilo.checkout.pricing.model.PricingResponse;
