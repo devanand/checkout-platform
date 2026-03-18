@@ -1,14 +1,14 @@
 package com.haiilo.checkout.pricing;
 
-import com.haiilo.checkout.offer.engine.OfferEngine;
-import com.haiilo.checkout.offer.model.contract.OfferRequest;
-import com.haiilo.checkout.offer.model.contract.OfferResult;
+import com.haiilo.checkout.api.offer.OfferRequest;
+import com.haiilo.checkout.api.offer.OfferResult;
+import com.haiilo.checkout.api.pricing.PricingRequest;
+import com.haiilo.checkout.api.pricing.PricingResponse;
 import com.haiilo.checkout.pricing.catalog.ProductCatalog;
 import com.haiilo.checkout.pricing.exception.UnknownProductException;
-import com.haiilo.checkout.pricing.model.PricingRequest;
-import com.haiilo.checkout.pricing.model.PricingResponse;
 import com.haiilo.checkout.pricing.model.Product;
 import com.haiilo.checkout.pricing.model.ProductId;
+import com.haiilo.checkout.pricing.port.OfferPort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ import java.util.Objects;
 public class PricingService {
 
     private final ProductCatalog catalog;
-    private final OfferEngine offerEngine;
+    private final OfferPort offerPort;
 
-    public PricingService(ProductCatalog catalog, OfferEngine offerEngine) {
+    public PricingService(ProductCatalog catalog, OfferPort offerPort) {
         this.catalog = Objects.requireNonNull(catalog, "catalog must not be null");
-        this.offerEngine = Objects.requireNonNull(offerEngine, "offerEngine must not be null");
+        this.offerPort = Objects.requireNonNull(offerPort, "offerPort must not be null");
     }
 
     public List<PricingResponse> price(List<PricingRequest> requests) {
@@ -37,22 +37,20 @@ public class PricingService {
                     .orElseThrow(() -> new UnknownProductException(request.productId()));
 
             products.add(product);
-            offerRequests.add(request.toOfferRequest(product.unitPrice()));
+            offerRequests.add(new OfferRequest(
+                    request.productId(),
+                    request.quantity(),
+                    product.unitPrice()));
         }
 
-        List<OfferResult> offerResults = offerEngine.applyOffers(offerRequests);
-        List<PricingResponse> responses = new ArrayList<>();
+        List<OfferResult> offerResults = offerPort.applyOffers(offerRequests);
 
+        List<PricingResponse> responses = new ArrayList<>(requests.size());
         for (int i = 0; i < requests.size(); i++) {
-            PricingRequest request = requests.get(i);
-            Product product = products.get(i);
-            OfferResult offerResult = offerResults.get(i);
-
-            responses.add(PricingResponse.fromOfferResult(
-                    request,
-                    product.unitPrice(),
-                    offerResult
-            ));
+            responses.add(PricingResponse.of(
+                    requests.get(i),
+                    products.get(i).unitPrice(),
+                    offerResults.get(i)));
         }
 
         return responses;

@@ -1,5 +1,6 @@
 package com.haiilo.checkout.pricing.infrastructure.persistence;
 
+import com.haiilo.checkout.api.money.Money;
 import com.haiilo.checkout.pricing.catalog.ProductCatalog;
 import com.haiilo.checkout.pricing.infrastructure.persistence.entity.ProductEntity;
 import com.haiilo.checkout.pricing.infrastructure.persistence.repository.ProductJpaRepository;
@@ -18,7 +19,8 @@ public class DatabaseProductCatalog implements ProductCatalog {
     private final ProductJpaRepository productJpaRepository;
 
     public DatabaseProductCatalog(ProductJpaRepository productJpaRepository) {
-        this.productJpaRepository = Objects.requireNonNull(productJpaRepository, "productJpaRepository must not be null");
+        this.productJpaRepository = Objects.requireNonNull(productJpaRepository,
+                "productJpaRepository must not be null");
     }
 
     @Override
@@ -33,7 +35,6 @@ public class DatabaseProductCatalog implements ProductCatalog {
     private Product toDomain(ProductEntity entity) {
         return new Product(
                 ProductId.of(entity.getId()),
-                entity.getPriceAmount()
-        );
+                Money.of(entity.getPriceAmount(), entity.getCurrency()));
     }
 }

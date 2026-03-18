@@ -1,14 +1,13 @@
 package com.haiilo.checkout.offer.model.rule;
 
+import com.haiilo.checkout.api.money.Money;
+import com.haiilo.checkout.api.offer.OfferResult;
 import com.haiilo.checkout.offer.model.AppliedOfferSummary;
 import com.haiilo.checkout.offer.model.ValidityPeriod;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-/**
- * Base implementation of the Offer interface providing common metadata.
- */
 public abstract class AbstractOffer implements Offer {
 
     private final OfferType type;
@@ -35,4 +34,10 @@ public abstract class AbstractOffer implements Offer {
     public AppliedOfferSummary toAppliedOfferSummary() {
         return new AppliedOfferSummary(type.name(), description);
     }
+
+    @Override
+    public abstract boolean appliesTo(int quantity);
+
+    @Override
+    public abstract OfferResult apply(int quantity, Money unitPrice);
 }

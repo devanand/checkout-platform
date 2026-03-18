@@ -1,0 +1,62 @@
+= Checkout API
+:toc: left
+:toclevels: 2
+
+== Overview
+
+The Checkout API calculates the total price of a cart, applying any active promotional offers.
+
+Base URL: `http://localhost:8080`
+
+== Endpoints
+
+=== POST /api/v1/checkout
+
+Calculates the price for a cart. Applies active offers where eligible.
+
+==== Multi-buy offer applied
+
+include::{snippets}/checkout/multi-buy/http-request.adoc[]
+include::{snippets}/checkout/multi-buy/request-fields.adoc[]
+include::{snippets}/checkout/multi-buy/http-response.adoc[]
+include::{snippets}/checkout/multi-buy/response-fields.adoc[]
+
+==== Percent discount offer applied
+
+include::{snippets}/checkout/percent-discount/http-request.adoc[]
+include::{snippets}/checkout/percent-discount/http-response.adoc[]
+
+==== Offer available but not applied (quantity below threshold)
+
+include::{snippets}/checkout/offer-not-applied/http-request.adoc[]
+include::{snippets}/checkout/offer-not-applied/http-response.adoc[]
+
+==== Multiple items with mixed offers
+
+include::{snippets}/checkout/multiple-items/http-request.adoc[]
+include::{snippets}/checkout/multiple-items/http-response.adoc[]
+
+== Error Responses
+
+All errors follow https://www.rfc-editor.org/rfc/rfc7807[RFC 7807 Problem Detail].
+
+=== Unknown product (404)
+
+include::{snippets}/checkout/unknown-product/http-request.adoc[]
+include::{snippets}/checkout/unknown-product/http-response.adoc[]
+include::{snippets}/checkout/unknown-product/response-fields.adoc[]
+
+=== Empty items list (400)
+
+include::{snippets}/checkout/empty-items/http-request.adoc[]
+include::{snippets}/checkout/empty-items/http-response.adoc[]
+
+=== Invalid quantity (400)
+
+include::{snippets}/checkout/invalid-quantity/http-request.adoc[]
+include::{snippets}/checkout/invalid-quantity/http-response.adoc[]
+
+=== Blank product ID (400)
+
+include::{snippets}/checkout/blank-product-id/http-request.adoc[]
+include::{snippets}/checkout/blank-product-id/http-response.adoc[]

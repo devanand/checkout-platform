@@ -1,13 +1,10 @@
 package com.haiilo.checkout.domain;
 
-import com.haiilo.checkout.pricing.model.PricingRequest;
-
 import java.util.Objects;
 
 public record CartItem(
         String productId,
-        int quantity
-) {
+        int quantity) {
     public CartItem {
         Objects.requireNonNull(productId, "productId must not be null");
 
@@ -20,11 +17,4 @@ public record CartItem(
         }
     }
 
-    public PricingRequest toPricingRequest(String currency) {
-        return new PricingRequest(
-                productId,
-                quantity,
-                currency
-        );
-    }
 }

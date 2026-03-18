@@ -1,9 +1,11 @@
 rootProject.name = "checkout-platform"
 
+include("api")
 include("checkout")
 include("pricing")
 include("offer")
 
+project(":api").buildFileName = "api.gradle"
 project(":checkout").buildFileName = "checkout.gradle"
 project(":pricing").buildFileName = "pricing.gradle"
 project(":offer").buildFileName = "offer.gradle"

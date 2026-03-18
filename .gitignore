@@ -45,5 +45,13 @@ target/
 # Logs
 *.log
 
+# Generated API docs
+docs/api/
+
+# Generated REST Docs snippets
+checkout/build/generated-snippets/
+
+# Static docs copied into resources
+checkout/src/main/resources/static/
 
 

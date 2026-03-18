@@ -1,42 +1,29 @@
 package com.haiilo.checkout.offer.model.rule;
 
-
-import com.haiilo.checkout.offer.model.AppliedOfferSummary;
-import com.haiilo.checkout.offer.model.contract.OfferResult;
+import com.haiilo.checkout.api.money.Money;
+import com.haiilo.checkout.api.offer.OfferResult;
 import com.haiilo.checkout.offer.model.ValidityPeriod;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Objects;
 
-/**
- * Offer that applies a bundled price when a required quantity
- * of a product is purchased.
- */
 public final class MultiBuyOffer extends AbstractOffer {
 
     private final int requiredQuantity;
-    private final BigDecimal bundlePrice;
+    private final String bundlePrice;
 
     public MultiBuyOffer(
             OfferType type,
             String description,
             ValidityPeriod validityPeriod,
             int requiredQuantity,
-            BigDecimal bundlePrice
-    ) {
+            String bundlePrice) {
         super(type, description, validityPeriod);
 
-        if (requiredQuantity <= 1) {
-            throw new IllegalArgumentException("required quantity must be greater than 1");
+        if (requiredQuantity < 2) {
+            throw new IllegalArgumentException("required quantity must be at least 2");
         }
 
         this.bundlePrice = Objects.requireNonNull(bundlePrice, "bundlePrice must not be null");
-
-        if (!(bundlePrice.compareTo(BigDecimal.ZERO) > 0)) {
-            throw new IllegalArgumentException("bundlePrice must be greater than zero");
-        }
-
         this.requiredQuantity = requiredQuantity;
     }
 
@@ -46,29 +33,25 @@ public final class MultiBuyOffer extends AbstractOffer {
     }
 
     @Override
-    public OfferResult apply(int quantity, BigDecimal unitPrice, String currency) {
+    public OfferResult apply(int quantity, Money unitPrice) {
         Objects.requireNonNull(unitPrice, "unitPrice must not be null");
-        Objects.requireNonNull(currency, "currency must not be null");
 
         if (quantity < 0) {
             throw new IllegalArgumentException("quantity must be >= 0");
         }
 
+        Money bundlePriceMoney = Money.of(bundlePrice, unitPrice.currency());
+
         int bundleCount = quantity / requiredQuantity;
         int remainder = quantity % requiredQuantity;
 
-        BigDecimal bundledTotal = bundlePrice.multiply(BigDecimal.valueOf(bundleCount));
-        BigDecimal remainderTotal = unitPrice.multiply(BigDecimal.valueOf(remainder));
-        BigDecimal total = bundledTotal.add(remainderTotal).setScale(2, RoundingMode.HALF_UP);
-
-        AppliedOfferSummary summary = toAppliedOfferSummary();
+        Money total = bundlePriceMoney.multiply(bundleCount)
+                .add(unitPrice.multiply(remainder));
 
         return new OfferResult(
                 total,
-                currency,
-                summary.type(),
-                summary.description(),
-                false
-        );
+                type().name(),
+                toAppliedOfferSummary().description(),
+                true);
     }
 }

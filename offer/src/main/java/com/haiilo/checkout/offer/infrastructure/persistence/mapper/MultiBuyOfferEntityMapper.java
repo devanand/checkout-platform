@@ -19,15 +19,13 @@ public class MultiBuyOfferEntityMapper implements OfferEntityMapper {
     public Offer toDomain(OfferEntity entity) {
         ValidityPeriod validityPeriod = new ValidityPeriod(
                 entity.getValidFrom(),
-                entity.getValidUntil()
-        );
+                entity.getValidUntil());
 
         return new MultiBuyOffer(
                 entity.getType(),
                 entity.getDescription(),
                 validityPeriod,
                 entity.getRequiredQuantity(),
-                entity.getBundlePrice()
-        );
+                entity.getBundlePrice().toPlainString());
     }
 }

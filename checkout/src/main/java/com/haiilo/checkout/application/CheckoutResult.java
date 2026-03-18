@@ -1,17 +1,15 @@
 package com.haiilo.checkout.application;
 
-import java.math.BigDecimal;
+import com.haiilo.checkout.api.money.Money;
+
 import java.util.List;
 import java.util.Objects;
 
 public record CheckoutResult(
         List<CheckoutLine> items,
-        BigDecimal total,
-        String currency
-) {
+        Money total) {
     public CheckoutResult {
         Objects.requireNonNull(items, "items must not be null");
         Objects.requireNonNull(total, "total must not be null");
-        Objects.requireNonNull(currency, "currency must not be null");
     }
 }

@@ -21,10 +21,10 @@ sourceSets {
 configurations {
 	integrationTestImplementation.extendsFrom testImplementation
 	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-	asciidoctorExt
 }
 
 dependencies {
+	implementation project(':api')
 	implementation project(':pricing')
 	implementation project(':offer')
 
@@ -68,9 +68,19 @@ tasks.register('integrationTest', Test) {
 }
 
 tasks.named('asciidoctor') {
-	dependsOn tasks.named('integrationTest')
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
+    dependsOn tasks.named('integrationTest')
+    inputs.dir snippetsDir
+    attributes snippets: snippetsDir
+    doLast {
+        copy {
+            from "${buildDir}/docs/asciidoc"
+            into "${rootDir}/docs/api"
+        }
+        copy {
+            from "${buildDir}/docs/asciidoc"
+            into "${projectDir}/src/main/resources/static/docs"
+        }
+    }
 }
 
 tasks.named('check') {
