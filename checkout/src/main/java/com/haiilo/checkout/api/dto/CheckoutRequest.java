@@ -1,7 +1,6 @@
 package com.haiilo.checkout.api.dto;
 
 import com.haiilo.checkout.domain.Cart;
-import com.haiilo.checkout.domain.CartItem;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 

@@ -7,6 +7,7 @@ junit-launcher = "1.13.4"
 mockito = "5.18.0"
 assertj = "3.27.7"
 spring-restdocs = "4.0.0"
+spotless = "6.25.0"
 
 [libraries]
 spring-context = { module = "org.springframework:spring-context", version.ref = "spring-context" }
@@ -21,3 +22,6 @@ assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc", version.ref = "spring-restdocs" }
 spring-restdocs-asciidoctor = { module = "org.springframework.restdocs:spring-restdocs-asciidoctor", version.ref = "spring-restdocs" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
