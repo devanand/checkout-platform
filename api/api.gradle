@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'com.diffplug.spotless' version '6.25.0'
+    id 'jacoco'
 }
 
 spotless {
@@ -11,7 +12,42 @@ spotless {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.14"
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.70
+            }
+        }
+    }
+}
+
+tasks.named('test') {
+    finalizedBy jacocoTestReport
+}
+
+tasks.named('check') {
+    dependsOn jacocoTestCoverageVerification
+}
+
 dependencies {
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.assertj.core
 }

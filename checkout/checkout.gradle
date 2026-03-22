@@ -1,9 +1,14 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.1.0-M2'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.asciidoctor.jvm.convert' version '4.0.5'
+    id 'java'
+    id 'org.springframework.boot' version '4.1.0-M2'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
     id 'com.diffplug.spotless' version '6.25.0'
+    id 'jacoco'
+}
+
+ext {
+    snippetsDir = file("build/generated-snippets")
 }
 
 spotless {
@@ -14,66 +19,69 @@ spotless {
     }
 }
 
-ext {
-	snippetsDir = file("build/generated-snippets")
-}
-
 sourceSets {
-	integrationTest {
-		java.srcDir file('src/integrationTest/java')
-		resources.srcDir file('src/integrationTest/resources')
-		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-		runtimeClasspath += output + compileClasspath
-	}
+    integrationTest {
+        java.srcDir file('src/integrationTest/java')
+        resources.srcDir file('src/integrationTest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
 }
 
 configurations {
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-dependencies {
-	implementation project(':api')
-	implementation project(':pricing')
-	implementation project(':offer')
-
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.h2database:h2'
-
-	compileOnly libs.lombok
-	annotationProcessor libs.lombok
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
-	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
-	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	integrationTestImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-}
-
-sourceSets {
-	integrationTest {
-		java.srcDir file('src/integrationTest/java')
-		resources.srcDir file('src/integrationTest/resources')
-		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-		runtimeClasspath += output + compileClasspath
-	}
-}
-
-tasks.named('test') {
-	outputs.dir snippetsDir
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    asciidoctorExt
 }
 
 tasks.register('integrationTest', Test) {
-	description = 'Runs integration tests.'
-	group = 'verification'
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	useJUnitPlatform()
-	outputs.dir snippetsDir
+    description = 'Runs integration tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    outputs.dir snippetsDir
+    finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = "0.8.14"
+}
+
+jacocoTestReport {
+    dependsOn test, integrationTest
+
+    executionData.setFrom(fileTree(buildDir).include(
+            "jacoco/test.exec",
+            "jacoco/integrationTest.exec"
+    ))
+
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test, integrationTest
+    executionData.setFrom(fileTree(buildDir).include(
+            "jacoco/test.exec",
+            "jacoco/integrationTest.exec"
+    ))
+
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.70
+            }
+        }
+    }
+}
+
+tasks.named('test') {
+    outputs.dir snippetsDir
+    finalizedBy jacocoTestReport
 }
 
 tasks.named('asciidoctor') {
@@ -93,5 +101,30 @@ tasks.named('asciidoctor') {
 }
 
 tasks.named('check') {
-	dependsOn tasks.named('integrationTest')
+    dependsOn tasks.named('integrationTest')
+    dependsOn jacocoTestCoverageVerification
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':pricing')
+    implementation project(':offer')
+
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.h2database:h2'
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    integrationTestImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+    asciidoctorExt libs.spring.restdocs.asciidoctor
 }
