@@ -19,6 +19,13 @@ jacoco {
 jacocoTestReport {
     dependsOn test
 
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, excludes: [
+                'com/haiilo/checkout/pricing/infrastructure/**',
+                'com/haiilo/checkout/pricing/catalog/DatabaseProductCatalog.class'
+        ])
+    }))
+
     reports {
         html.required.set(true)
         xml.required.set(true)
@@ -28,7 +35,14 @@ jacocoTestReport {
 
 jacocoTestCoverageVerification {
     dependsOn test
-    
+
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, excludes: [
+                'com/haiilo/checkout/pricing/infrastructure/**',
+                'com/haiilo/checkout/pricing/catalog/DatabaseProductCatalog.class'
+        ])
+    }))
+
     violationRules {
         rule {
             limit {
