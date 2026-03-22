@@ -27,10 +27,20 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    dependsOn test
+
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, excludes: [
+                '**/infrastructure/**',
+                '**/persistence/**',
+                '**/catalog/DatabaseOfferCatalog.class'
+        ])
+    }))
+
     violationRules {
         rule {
             limit {
-                minimum = 0.80
+                minimum = 0.85
             }
         }
     }
